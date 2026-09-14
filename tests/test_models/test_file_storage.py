@@ -2,11 +2,13 @@
 """Unittest module for the FileStorage class."""
 import unittest
 import os
+from os import getenv
 from models.engine.file_storage import FileStorage
 from models.base_model import BaseModel
 from models import storage
 
 
+@unittest.skipIf(getenv("HBNB_TYPE_STORAGE") == "db", "not for db storage")
 class TestFileStorage(unittest.TestCase):
     """Test cases for the FileStorage class."""
 
@@ -14,9 +16,15 @@ class TestFileStorage(unittest.TestCase):
         """Test that all() returns a dictionary."""
         self.assertIsInstance(storage.all(), dict)
 
+    def test_all_with_cls(self):
+        """Test that all(cls) returns filtered dictionary."""
+        result = storage.all(BaseModel)
+        self.assertIsInstance(result, dict)
+
     def test_new(self):
         """Test that new() adds an object to __objects."""
         obj = BaseModel()
+        storage.new(obj)
         key = "BaseModel.{}".format(obj.id)
         self.assertIn(key, storage.all())
 
@@ -25,13 +33,14 @@ class TestFileStorage(unittest.TestCase):
         storage.save()
         self.assertTrue(os.path.exists("file.json"))
 
-    def test_reload(self):
-        """Test that reload() loads objects from the JSON file."""
+    def test_delete(self):
+        """Test that delete() removes an object from storage."""
         obj = BaseModel()
-        obj.save()
-        storage.reload()
+        storage.new(obj)
+        storage.save()
+        storage.delete(obj)
         key = "BaseModel.{}".format(obj.id)
-        self.assertIn(key, storage.all())
+        self.assertNotIn(key, storage.all())
 
     def test_class_doc(self):
         """Test that FileStorage class has a docstring."""

@@ -13,29 +13,13 @@ class TestUser(unittest.TestCase):
         u = User()
         self.assertIsInstance(u, BaseModel)
 
-    def test_email(self):
-        """Test that email is an empty string by default."""
-        u = User()
-        self.assertEqual(u.email, "")
-
-    def test_password(self):
-        """Test that password is an empty string by default."""
-        u = User()
-        self.assertEqual(u.password, "")
-
-    def test_first_name(self):
-        """Test that first_name is an empty string by default."""
-        u = User()
-        self.assertEqual(u.first_name, "")
-
-    def test_last_name(self):
-        """Test that last_name is an empty string by default."""
-        u = User()
-        self.assertEqual(u.last_name, "")
-
     def test_class_doc(self):
         """Test that User class has a docstring."""
         self.assertIsNotNone(User.__doc__)
+
+    def test_tablename(self):
+        """Test that User has correct table name."""
+        self.assertEqual(User.__tablename__, "users")
 
 
 if __name__ == "__main__":

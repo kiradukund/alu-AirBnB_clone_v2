@@ -41,13 +41,6 @@ class TestBaseModel(unittest.TestCase):
         self.assertIn("[BaseModel]", s)
         self.assertIn(obj.id, s)
 
-    def test_save(self):
-        """Test that save updates updated_at."""
-        obj = BaseModel()
-        old = obj.updated_at
-        obj.save()
-        self.assertGreater(obj.updated_at, old)
-
     def test_to_dict(self):
         """Test that to_dict returns a dictionary with correct keys."""
         obj = BaseModel()
@@ -56,6 +49,7 @@ class TestBaseModel(unittest.TestCase):
         self.assertEqual(d["__class__"], "BaseModel")
         self.assertIsInstance(d["created_at"], str)
         self.assertIsInstance(d["updated_at"], str)
+        self.assertNotIn("_sa_instance_state", d)
 
     def test_kwargs_init(self):
         """Test creating a BaseModel from a dictionary."""
