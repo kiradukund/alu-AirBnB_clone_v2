@@ -2,7 +2,6 @@
 """This module defines the BaseModel class for the AirBnB clone project."""
 import uuid
 from datetime import datetime
-from os import getenv
 from sqlalchemy import Column, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -26,13 +25,11 @@ class BaseModel:
                 if key in ("created_at", "updated_at"):
                     value = datetime.strptime(value, time_fmt)
                 setattr(self, key, value)
-        if not getattr(self, "id", None):
+        if "id" not in self.__dict__:
             self.id = str(uuid.uuid4())
-        if not getattr(self, "created_at", None) or \
-                isinstance(self.created_at, Column):
+        if "created_at" not in self.__dict__:
             self.created_at = datetime.utcnow()
-        if not getattr(self, "updated_at", None) or \
-                isinstance(self.updated_at, Column):
+        if "updated_at" not in self.__dict__:
             self.updated_at = datetime.utcnow()
 
     def __str__(self):
