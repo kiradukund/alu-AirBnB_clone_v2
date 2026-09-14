@@ -6,6 +6,7 @@ from os import getenv
 from sqlalchemy import Column, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 
+time_fmt = "%Y-%m-%dT%H:%M:%S.%f"
 Base = declarative_base()
 
 
@@ -18,19 +19,20 @@ class BaseModel:
 
     def __init__(self, *args, **kwargs):
         """Initialize a new BaseModel instance."""
-        fmt = "%Y-%m-%dT%H:%M:%S.%f"
         if kwargs:
             for key, value in kwargs.items():
                 if key == "__class__":
                     continue
                 if key in ("created_at", "updated_at"):
-                    value = datetime.strptime(value, fmt)
+                    value = datetime.strptime(value, time_fmt)
                 setattr(self, key, value)
-        if not hasattr(self, 'id') or self.id is None:
+        if not getattr(self, "id", None):
             self.id = str(uuid.uuid4())
-        if not hasattr(self, 'created_at') or self.created_at is None:
+        if not getattr(self, "created_at", None) or \
+                isinstance(self.created_at, Column):
             self.created_at = datetime.utcnow()
-        if not hasattr(self, 'updated_at') or self.updated_at is None:
+        if not getattr(self, "updated_at", None) or \
+                isinstance(self.updated_at, Column):
             self.updated_at = datetime.utcnow()
 
     def __str__(self):
@@ -49,8 +51,10 @@ class BaseModel:
         """Return a dictionary representation of the instance."""
         d = self.__dict__.copy()
         d["__class__"] = type(self).__name__
-        d["created_at"] = self.created_at.isoformat()
-        d["updated_at"] = self.updated_at.isoformat()
+        if isinstance(d.get("created_at"), datetime):
+            d["created_at"] = d["created_at"].isoformat()
+        if isinstance(d.get("updated_at"), datetime):
+            d["updated_at"] = d["updated_at"].isoformat()
         d.pop("_sa_instance_state", None)
         return d
 
